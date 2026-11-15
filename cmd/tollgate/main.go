@@ -18,6 +18,7 @@ import (
 
 	tollgatev1alpha1 "github.com/kube-tollgate/kube-tollgate/pkg/apis/tollgate/v1alpha1"
 	"github.com/kube-tollgate/kube-tollgate/pkg/metrics"
+	"github.com/kube-tollgate/kube-tollgate/pkg/policy"
 )
 
 var (
@@ -107,6 +108,17 @@ func main() {
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
+	policyCache := policy.NewMemoryCache()
+	if err := (&policy.Reconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Cache:  policyCache,
+		Log:    ctrl.Log.WithName("controllers").WithName("TollgatePolicy"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "TollgatePolicy")
 		os.Exit(1)
 	}
 
