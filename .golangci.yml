@@ -1,0 +1,47 @@
+# .golangci.yml - Linter configuration for kube-tollgate
+# Configures golangci-lint with rigorous linters suitable for high-performance Kubernetes admission controllers.
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters-settings:
+  govet:
+    check-shadowing: false
+  gocyclo:
+    min-complexity: 15
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 3
+  misspell:
+    locale: US
+  lll:
+    line-length: 120
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck     # Error checking
+    - gosimple     # Code simplification
+    - govet        # Standard Go vet tool
+    - ineffassign  # Detects ineffectual assignments
+    - staticcheck  # Static analysis checks
+    - gocyclo      # Computes and checks cyclomatic complexity
+    - gofmt        # Checks whether code was gofmt-ed
+    - goimports    # Checks missing imports and formatting
+    - revive       # Drop-in replacement for golint with configurable rules
+    - misspell     # Finds commonly misspelled English words
+    - dogsled      # Checks for excessive blank identifiers
+
+issues:
+  exclude-dirs:
+    - bin
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
