@@ -1,0 +1,13 @@
+# Service exposing kube-tollgate webhook HTTPS port (9443) on standard HTTPS port (443)
+apiVersion: v1
+kind: Service
+metadata:
+  name: tollgate-webhook-service
+  namespace: tollgate-system
+spec:
+  ports:
+    - name: https
+      port: 443
+      targetPort: 9443
+  selector:
+    app.kubernetes.io/name: kube-tollgate

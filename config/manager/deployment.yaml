@@ -1,0 +1,72 @@
+# Namespace and Deployment for kube-tollgate admission controller daemon
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tollgate-system
+  labels:
+    app.kubernetes.io/name: kube-tollgate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tollgate-controller-manager
+  namespace: tollgate-system
+  labels:
+    app.kubernetes.io/name: kube-tollgate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-tollgate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kube-tollgate
+    spec:
+      serviceAccountName: tollgate-controller-manager
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: manager
+          image: kube-tollgate:dev
+          imagePullPolicy: IfNotPresent
+          command:
+            - /tollgate
+          args:
+            - --webhook-port=9443
+            - --metrics-port=8080
+            - --cert-dir=/tmp/k8s-webhook-server/serving-certs
+            - --enable-auto-cert=true
+            - --log-level=info
+          ports:
+            - containerPort: 9443
+              name: webhook-server
+              protocol: TCP
+            - containerPort: 8080
+              name: metrics
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: cert-dir
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+      volumes:
+        - name: cert-dir
+          emptyDir: {}

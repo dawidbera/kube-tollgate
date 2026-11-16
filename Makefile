@@ -103,9 +103,11 @@ deploy: manifests ## Deploy tollgate to the K8s cluster specified in ~/.kube/con
 	kubectl apply -f config/crd/bases
 	kubectl apply -f config/rbac
 	kubectl apply -f config/webhook
+	kubectl apply -f config/manager
 
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
+	kubectl delete -f config/manager --ignore-not-found=true
 	kubectl delete -f config/webhook --ignore-not-found=true
 	kubectl delete -f config/rbac --ignore-not-found=true
 	kubectl delete -f config/crd/bases --ignore-not-found=true

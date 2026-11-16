@@ -1,0 +1,62 @@
+# ClusterRole granting kube-tollgate permissions to watch TollgatePolicies, inspect workloads, and patch webhooks
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tollgate-manager-role
+rules:
+  # Tollgate custom resources
+  - apiGroups:
+      - finops.tollgate.io
+    resources:
+      - tollgatepolicies
+      - tollgatepolicies/status
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  # Core Kubernetes resources for label inheritance and budget aggregation
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  # Webhook configurations for self-signed TLS CA bundle injection
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  # Coordination & leader election leases (if needed)
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
