@@ -15,10 +15,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	tollgatev1alpha1 "github.com/kube-tollgate/kube-tollgate/pkg/apis/tollgate/v1alpha1"
 	"github.com/kube-tollgate/kube-tollgate/pkg/metrics"
 	"github.com/kube-tollgate/kube-tollgate/pkg/policy"
+	tollgatewebhook "github.com/kube-tollgate/kube-tollgate/pkg/webhook"
 )
 
 var (
@@ -121,6 +123,18 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "TollgatePolicy")
 		os.Exit(1)
 	}
+
+	// Register admission webhooks
+	engine := policy.NewEngine(policyCache)
+	mutatingHandler := tollgatewebhook.NewMutatingHandler(
+		mgr.GetClient(),
+		engine,
+		mgr.GetScheme(),
+		ctrl.Log.WithName("webhook").WithName("mutating"),
+	)
+	mgr.GetWebhookServer().Register("/mutate", &admission.Webhook{
+		Handler: mutatingHandler,
+	})
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
