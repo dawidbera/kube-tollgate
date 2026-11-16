@@ -1,0 +1,24 @@
+# Scenario 03: Oversized Pod exceeding namespace budget ceiling
+# Policy budget is 32 cores CPU; pod requests 34 cores CPU.
+# Validating webhook rejects this workload with HTTP 403 BUDGET_EXCEEDED.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: oversized-budget-breaker
+  namespace: team-billing
+  labels:
+    cost-center: "CC-1001"
+    team: "billing-platform"
+    environment: "production"
+spec:
+  containers:
+    - name: hungry-worker
+      image: alpine:3.20
+      command: ["sleep", "3600"]
+      resources:
+        requests:
+          cpu: "34"
+          memory: "16Gi"
+        limits:
+          cpu: "34"
+          memory: "16Gi"

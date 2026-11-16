@@ -1,0 +1,48 @@
+# Sample namespace and TollgatePolicy for demonstration scenarios
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-billing
+  labels:
+    cost-center: "CC-1001"
+  annotations:
+    team: "billing-platform"
+---
+apiVersion: finops.tollgate.io/v1alpha1
+kind: TollgatePolicy
+metadata:
+  name: default-budget-policy
+  namespace: team-billing
+spec:
+  mode: Enforce
+  labels:
+    required:
+      - key: "cost-center"
+        pattern: "^CC-[0-9]{4}$"
+      - key: "team"
+      - key: "environment"
+        pattern: "^(production|staging|development)$"
+    autoInject:
+      enabled: true
+      inheritFromNamespace: true
+      defaults:
+        cost-center: "CC-9999"
+        environment: "development"
+  resources:
+    defaults:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    maxAllowedPerPod:
+      cpu: "4"
+      memory: "8Gi"
+    maxRatio:
+      cpu: 4.0
+      memory: 2.0
+  budget:
+    aggregateRequests:
+      cpu: "32"
+      memory: "64Gi"

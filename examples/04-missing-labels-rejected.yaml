@@ -1,0 +1,47 @@
+# Scenario 04: Pod with invalid or missing required FinOps labels in a strict namespace without auto-injection
+# Validating webhook rejects this workload with HTTP 403 MISSING_OR_INVALID_LABEL.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-strict
+---
+apiVersion: finops.tollgate.io/v1alpha1
+kind: TollgatePolicy
+metadata:
+  name: strict-label-policy
+  namespace: team-strict
+spec:
+  mode: Enforce
+  labels:
+    required:
+      - key: "cost-center"
+        pattern: "^CC-[0-9]{4}$"
+      - key: "team"
+      - key: "environment"
+        pattern: "^(production|staging|development)$"
+    autoInject:
+      enabled: false
+  resources:
+    defaults:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: noncompliant-worker
+  namespace: team-strict
+  labels:
+    # Invalid format for cost-center: fails ^CC-[0-9]{4}$
+    cost-center: "UNKNOWN"
+    # Missing 'environment' and 'team' labels
+spec:
+  containers:
+    - name: worker
+      image: alpine:3.20
+      command: ["sleep", "3600"]
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"

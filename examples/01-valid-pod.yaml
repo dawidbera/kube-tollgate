@@ -1,0 +1,21 @@
+# Scenario 01: Fully compliant Pod satisfying FinOps labels, resource bounds, and budget limits
+apiVersion: v1
+kind: Pod
+metadata:
+  name: valid-billing-worker
+  namespace: team-billing
+  labels:
+    cost-center: "CC-1001"
+    team: "billing-platform"
+    environment: "production"
+spec:
+  containers:
+    - name: worker
+      image: nginx:1.27-alpine
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "512Mi"
+        limits:
+          cpu: "1000m"
+          memory: "1Gi"
