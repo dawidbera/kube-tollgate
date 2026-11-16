@@ -34,8 +34,8 @@ spec:
         cpu: "100m"
         memory: "128Mi"
       limits:
-        cpu: "500m"
-        memory: "512Mi"
+        cpu: "400m"
+        memory: "256Mi"
     maxAllowedPerPod:
       cpu: "4"
       memory: "8Gi"
@@ -44,5 +44,5 @@ spec:
       memory: 2.0
   budget:
     aggregateRequests:
-      cpu: "32"
-      memory: "64Gi"
+      cpu: "2"
+      memory: "4Gi"

@@ -1,7 +1,7 @@
 # Scenario 02: Unbounded Pod missing resource requests/limits and required labels
 # Mutating webhook injects:
 # - Labels: cost-center from Namespace label, team from Namespace annotation, environment from policy default
-# - Resources: default requests (100m CPU, 128Mi RAM) and limits (500m CPU, 512Mi RAM)
+# - Resources: default requests (100m CPU, 128Mi RAM) and limits (400m CPU, 256Mi RAM)
 apiVersion: v1
 kind: Pod
 metadata:

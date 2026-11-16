@@ -1,5 +1,5 @@
 # Scenario 03: Oversized Pod exceeding namespace budget ceiling
-# Policy budget is 32 cores CPU; pod requests 34 cores CPU.
+# Policy budget is 2 cores CPU; pod requests 2500m CPU.
 # Validating webhook rejects this workload with HTTP 403 BUDGET_EXCEEDED.
 apiVersion: v1
 kind: Pod
@@ -17,8 +17,8 @@ spec:
       command: ["sleep", "3600"]
       resources:
         requests:
-          cpu: "34"
-          memory: "16Gi"
+          cpu: "2500m"
+          memory: "2Gi"
         limits:
-          cpu: "34"
-          memory: "16Gi"
+          cpu: "2500m"
+          memory: "2Gi"

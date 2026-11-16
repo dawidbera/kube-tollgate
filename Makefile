@@ -98,8 +98,18 @@ cluster-down: ## Tear down the local k3d cluster.
 cluster-import: docker-build ## Import local docker image into k3d cluster.
 	k3d image import $(IMG) -c $(CLUSTER_NAME)
 
+.PHONY: demo
+demo: ## Generate demo GIF animation using vhs.
+	@mkdir -p assets
+	vhs hack/demo.tape
+
+.PHONY: test-e2e
+test-e2e: ## Run end-to-end admission scenario tests against the active cluster.
+	./hack/test-e2e.sh
+
 .PHONY: deploy
 deploy: manifests ## Deploy tollgate to the K8s cluster specified in ~/.kube/config.
+	kubectl create namespace tollgate-system --dry-run=client -o yaml | kubectl apply -f -
 	kubectl apply -f config/crd/bases
 	kubectl apply -f config/rbac
 	kubectl apply -f config/webhook

@@ -31,6 +31,7 @@ k3d image import "${IMAGE_NAME}" -c "${CLUSTER_NAME}"
 
 # 4. Deploy manifests
 echo "==> [kubectl] Deploying CRDs, RBAC, Webhooks, and Controller Manager..."
+kubectl create namespace tollgate-system --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f config/crd/bases
 kubectl apply -f config/rbac
 kubectl apply -f config/webhook
