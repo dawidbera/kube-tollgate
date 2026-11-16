@@ -136,6 +136,16 @@ func main() {
 		Handler: mutatingHandler,
 	})
 
+	validatingHandler := tollgatewebhook.NewValidatingHandler(
+		mgr.GetClient(),
+		engine,
+		mgr.GetScheme(),
+		ctrl.Log.WithName("webhook").WithName("validating"),
+	)
+	mgr.GetWebhookServer().Register("/validate", &admission.Webhook{
+		Handler: validatingHandler,
+	})
+
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)
